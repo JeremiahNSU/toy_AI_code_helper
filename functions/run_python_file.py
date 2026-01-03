@@ -1,9 +1,10 @@
 import os 
 import subprocess
+import sys
 def run_python_file(working_directory, file_path, args=None):
 
     working_dir_abs = os.path.abspath(working_directory)
-    full_path = os.path.join(working_dir_abs, file_path)
+    full_path = os.path.abspath(os.path.join(working_dir_abs, file_path))
     target_file = os.path.basename(full_path)
     valid_target_dir = os.path.commonpath([working_dir_abs, full_path]) == working_dir_abs
 
@@ -17,7 +18,7 @@ def run_python_file(working_directory, file_path, args=None):
         return f'Error: "{file_path}" is not a Python file'
     
     try:
-        command = ["python", full_path] 
+        command = [sys.executable, full_path] 
         if not (args == None):
             command.extend(args)
         
@@ -25,12 +26,15 @@ def run_python_file(working_directory, file_path, args=None):
         completed_process = subprocess.run(command, capture_output=True, text=True,cwd=working_dir_abs , timeout=30)
         output_string =""
         if completed_process.returncode != 0:
-            output_string += f"Process exited with code {completed_process.returncode}"
-        if completed_process.stdout or completed_process.stderr:
+            output_string += f"Process exited with code {completed_process.returncode}\n"
+        if completed_process.stdout :
             output_string += f"STDOUT: {completed_process.stdout}"
-            output_string += f"\nSTDERR: {completed_process.stderr}"
-        else:
-            output_string += "No output produced."
+        if completed_process.stdout and completed_process.stderr:
+            output_string += "\n"
+        if completed_process.stderr:
+            output_string += f"STDERR: {completed_process.stderr}"
+        if not completed_process.stdout and not completed_process.stderr:
+            output_string += "No output produced"
 
         return output_string
     except Exception as e:
