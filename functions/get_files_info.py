@@ -1,6 +1,8 @@
 
 import os
 from builtins import Error
+
+
 def get_files_info(working_directory, directory="."):
     working_dir_abs = os.path.abspath(working_directory)
     target_dir = os.path.normpath(os.path.join(working_dir_abs, directory))
@@ -32,6 +34,7 @@ def get_files_info(working_directory, directory="."):
 
     for file_info in files_info:
         all_file_info += f"- {file_info['name']}: file_size={file_info['size']} bytes, is_dir={file_info['is_dir']}\n"
+    
     return all_file_info
 
     

@@ -1,11 +1,10 @@
 import os
-from urllib import response
 from dotenv import load_dotenv
 from google import genai
 import argparse
 from google.genai import types
 from prompts import system_prompt
-
+from functions.call_function import *
 def main():
     load_dotenv()
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -25,7 +24,9 @@ def main():
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=messages,
-        config=types.GenerateContentConfig(system_instruction=system_prompt)
+        config=types.GenerateContentConfig(
+    tools=[available_functions], system_instruction=system_prompt
+)
     )
 
     if response.usage_metadata is None:
@@ -34,9 +35,18 @@ def main():
         print(f"User prompt: {args.user_prompt}.")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
-    print("Response:")
-    print(response.text)
+
+
     
+    
+    if response.function_calls is None:
+        print("Response:")
+        print(response.text)
+    else:
+        for function_call in response.function_calls:
+            print(f"Calling function: {function_call.name}({function_call.args})")
+
+
 
 
 if __name__ == "__main__":
