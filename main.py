@@ -1,10 +1,12 @@
 import os
+from urllib import response
 from dotenv import load_dotenv
 from google import genai
 import argparse
 from google.genai import types
 from prompts import system_prompt
-from functions.call_function import *
+from call_function import *
+
 def main():
     load_dotenv()
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -37,14 +39,29 @@ def main():
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
 
-    
+
     
     if response.function_calls is None:
         print("Response:")
         print(response.text)
     else:
+        function_results = []
+
         for function_call in response.function_calls:
-            print(f"Calling function: {function_call.name}({function_call.args})")
+            function_call_result = call_function(function_call, verbose=args.verbose)
+
+            if not function_call_result.parts:
+                raise Exception("Function call returned no result")
+            if function_call_result.parts[0].function_response is None:
+                raise Exception("Function call returned no response")
+            if function_call_result.parts[0].function_response.response is None:
+                raise Exception("Function call returned no result field in response")
+
+            function_results.append(function_call_result.parts[0])
+
+            if args.verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
+
 
 
 
