@@ -82,3 +82,30 @@ This pattern loosely resembles how tools like Cursor / Claude Code work, but as 
    ```bash
    git clone https://github.com/JeremiahNSUBE/toy_AI_code_helper.git
    cd toy_AI_code_helper
+
+2. **Create a virtual environment and install dependencies**
+
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+3. **Set your environment variables**
+
+cp .env.example .env
+# Then open .env and set GEMINI_API_KEY=your_api_key_here
+
+4. **Run the agent**
+
+python main.py
+
+
+## Note
+
+This was a learning project and not meant for production use. THe agent may make mistakes, always double check.
+
+## Example Usage
+
+Once the agent is running, you can point it at a Python project and give it a goal. For example:
+
+```bash
+python main.py --project-path /path/to/your/project --command "Fix failing tests in tests/test_calculator.py"
